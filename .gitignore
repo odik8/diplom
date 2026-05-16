@@ -1,0 +1,38 @@
+# Claude Code settings
+.claude/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.expo/
+web-build/
+
+# Environment files — keep .env.example, ignore actual secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Expo
+.expo-shared/
+
+# Coverage
+coverage/
+
+# Misc
+tmp/
+temp/

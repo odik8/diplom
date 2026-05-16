@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "MealDelivery",
+    "slug": "meal-delivery",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#FF6B35"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FF6B35"
+      },
+      "package": "com.mealdelivery.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mealdelivery.app"
+    }
+  }
+}
