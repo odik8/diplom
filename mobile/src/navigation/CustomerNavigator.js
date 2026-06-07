@@ -20,6 +20,7 @@ const Stack = createNativeStackNavigator();
 const headerOpts = {
   headerStyle: { backgroundColor: colors.surface },
   headerTitleStyle: { color: colors.text },
+  contentStyle: { backgroundColor: colors.background },
 };
 
 function HomeStack() {
@@ -28,7 +29,14 @@ function HomeStack() {
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Главная' }} />
       <Stack.Screen name="Menu" component={MenuScreen} />
       <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: 'Блюдо' }} />
-      <Stack.Screen name="Cart" component={CartScreen} options={{ title: 'Корзина' }} />
+    </Stack.Navigator>
+  );
+}
+
+function CartStack() {
+  return (
+    <Stack.Navigator screenOptions={headerOpts}>
+      <Stack.Screen name="CartMain" component={CartScreen} options={{ title: 'Корзина' }} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Оформление' }} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ title: 'Заказ' }} />
     </Stack.Navigator>
@@ -80,8 +88,8 @@ export default function CustomerNavigator() {
         options={{ title: 'Главная', tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} /> }}
       />
       <Tab.Screen
-        name="CartTab" component={CartScreen}
-        options={{ title: 'Корзина', tabBarIcon: ({ focused }) => <CartTabIcon focused={focused} />, headerShown: true, headerTitle: 'Корзина' }}
+        name="CartTab" component={CartStack}
+        options={{ title: 'Корзина', tabBarIcon: ({ focused }) => <CartTabIcon focused={focused} />, headerShown: false }}
       />
       <Tab.Screen
         name="OrdersTab" component={OrdersStack}

@@ -14,7 +14,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     addItem(item, qty);
     Alert.alert('Добавлено в корзину', `${item.name} × ${qty}`, [
       { text: 'Продолжить покупки' },
-      { text: 'В корзину', onPress: () => navigation.navigate('Cart') },
+      { text: 'В корзину', onPress: () => navigation.navigate('CartTab') },
     ]);
   };
 

@@ -61,14 +61,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   price_at_time DECIMAL(10, 2) NOT NULL
 );
 
--- Seed admin user (password: admin123)
-INSERT INTO users (name, email, password_hash, role)
-VALUES (
-  'Администратор',
-  'admin@mealdelivery.com',
-  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
-  'admin'
-) ON CONFLICT (email) DO NOTHING;
+-- All users and passwords are defined in src/db/credentials.js — run seed-data.js to load them.
 
 -- Seed categories
 INSERT INTO categories (name, sort_order) VALUES

@@ -1,0 +1,51 @@
+// Test accounts for development. Run seed-data.js to load into DB.
+module.exports = [
+  {
+    role: 'admin',
+    name: 'Администратор',
+    email: 'admin@mealdelivery.com',
+    password: 'admin123',
+    phone: null,
+    address: null,
+  },
+  {
+    role: 'customer',
+    name: 'Иван Петров',
+    email: 'ivan@test.com',
+    password: 'client123',
+    phone: '+7 (999) 111-22-33',
+    address: 'ул. Пушкина, д. 1, кв. 5',
+  },
+  {
+    role: 'customer',
+    name: 'Мария Сидорова',
+    email: 'maria@test.com',
+    password: 'client123',
+    phone: '+7 (999) 444-55-66',
+    address: 'пр. Ленина, д. 42, кв. 18',
+  },
+  {
+    role: 'customer',
+    name: 'Алексей Козлов',
+    email: 'alex@test.com',
+    password: 'client123',
+    phone: '+7 (999) 777-88-99',
+    address: 'ул. Гагарина, д. 15, кв. 7',
+  },
+  {
+    role: 'courier',
+    name: 'Дмитрий Васильев',
+    email: 'dmitry@courier.com',
+    password: 'courier123',
+    phone: '+7 (999) 222-33-44',
+    address: null,
+  },
+  {
+    role: 'courier',
+    name: 'Григорий Портов',
+    email: 'elena@courier.com',
+    password: 'courier123',
+    phone: '+7 (999) 555-66-77',
+    address: null,
+  },
+];
