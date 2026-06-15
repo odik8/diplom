@@ -38,6 +38,12 @@ services:
       JWT_SECRET: super_secret_jwt_key_diplom_2026
       JWT_EXPIRES_IN: 7d
       NODE_ENV: development
+      # PayPalych: тестовый режим эмулирует оплату локально.
+      # Для боевого режима укажите PAYPALYCH_TOKEN и PAYPALYCH_SHOP_ID
+      # из кабинета https://paypalych.com и уберите PAYPALYCH_TEST_MODE.
+      PAYPALYCH_TEST_MODE: "true"
+      # PAYPALYCH_TOKEN: ""
+      # PAYPALYCH_SHOP_ID: ""
     ports:
       - "5001:5001"
     depends_on:
@@ -54,18 +60,6 @@ services:
     depends_on:
       - backend
 
-  mobile:
-    build: ./mobile
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-      - "19000:19000"
-      - "19001:19001"
-      - "19006:19006"
-    environment:
-      REACT_NATIVE_PACKAGER_HOSTNAME: "192.168.11.108"
-    depends_on:
-      - backend
 
 volumes:
   db_data:

@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   ActivityIndicator, Alert, RefreshControl,
 } from 'react-native';
-import { orderAPI } from '../../services/api';
+import { orderAPI, paymentAPI } from '../../services/api';
 import { colors, spacing, radius, shadow } from '../../theme';
 
 const STEPS = ['pending', 'confirmed', 'preparing', 'ready', 'picked_up', 'delivered'];
@@ -20,12 +20,19 @@ const STATUS_LABELS = {
   delivered: { label: 'Доставлен ✓',           color: '#4CAF50' },
   cancelled: { label: 'Отменён',               color: '#F44336' },
 };
+const PAYMENT_LABELS = {
+  unpaid:  { label: 'Не оплачен',     color: '#FF9800' },
+  pending: { label: 'Ожидает оплаты', color: '#2196F3' },
+  paid:    { label: 'Оплачен ✓',      color: '#4CAF50' },
+  failed:  { label: 'Ошибка оплаты',  color: '#F44336' },
+};
 
 export default function OrderDetailScreen({ route, navigation }) {
   const { orderId, order: initialOrder } = route.params;
   const [order, setOrder] = useState(initialOrder || null);
   const [loading, setLoading] = useState(!initialOrder);
   const [refreshing, setRefreshing] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -38,6 +45,23 @@ export default function OrderDetailScreen({ route, navigation }) {
   }, [orderId]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Обновляем статус оплаты при возврате с экрана оплаты
+  useEffect(() => navigation.addListener('focus', load), [navigation, load]);
+
+  const handlePay = async () => {
+    setPaying(true);
+    try {
+      const { data } = await paymentAPI.create(order.id);
+      if (data.payment_url) {
+        navigation.navigate('Payment', { url: data.payment_url, amount: order.total_price });
+      }
+    } catch (err) {
+      Alert.alert('Ошибка', err.response?.data?.message || 'Не удалось создать платёж');
+    } finally {
+      setPaying(false);
+    }
+  };
 
   const handleCancel = () => {
     Alert.alert('Отменить заказ?', 'Это действие нельзя отменить', [
@@ -56,6 +80,8 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   const status = STATUS_LABELS[order.status] || { label: order.status, color: '#999' };
   const currentStep = STEPS.indexOf(order.status);
+  const payment = PAYMENT_LABELS[order.payment_status] || PAYMENT_LABELS.unpaid;
+  const canPay = order.payment_status !== 'paid' && order.status !== 'cancelled';
 
   return (
     <ScrollView
@@ -116,6 +142,22 @@ export default function OrderDetailScreen({ route, navigation }) {
         {order.notes && <Text style={styles.notes}>💬 {order.notes}</Text>}
       </View>
 
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Оплата</Text>
+        <View style={styles.itemRow}>
+          <Text style={styles.itemName}>Статус оплаты</Text>
+          <Text style={[styles.paymentStatus, { color: payment.color }]}>{payment.label}</Text>
+        </View>
+        {canPay && (
+          <TouchableOpacity style={styles.payBtn} onPress={handlePay} disabled={paying}>
+            {paying
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.payBtnText}>💳 Оплатить {Number(order.total_price).toFixed(2)} ₽</Text>
+            }
+          </TouchableOpacity>
+        )}
+      </View>
+
       {['pending', 'confirmed'].includes(order.status) && (
         <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
           <Text style={styles.cancelBtnText}>Отменить заказ</Text>
@@ -149,6 +191,9 @@ const styles = StyleSheet.create({
   address: { fontSize: 14, color: colors.text },
   courier: { fontSize: 14, color: colors.secondary, fontWeight: '500' },
   notes: { fontSize: 13, color: colors.textSecondary },
+  paymentStatus: { fontSize: 14, fontWeight: '600' },
+  payBtn: { backgroundColor: colors.primary, borderRadius: radius.md, padding: spacing.md, alignItems: 'center', marginTop: spacing.xs },
+  payBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
   cancelBtn: { borderWidth: 1.5, borderColor: colors.error, borderRadius: radius.md, padding: spacing.md, alignItems: 'center' },
   cancelBtnText: { color: colors.error, fontWeight: '600', fontSize: 15 },
 });

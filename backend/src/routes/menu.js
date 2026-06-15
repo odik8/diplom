@@ -5,6 +5,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 // Public
 router.get('/categories', ctrl.getCategories);
 router.get('/items', ctrl.getMenuItems);
+router.get('/popular', ctrl.getPopularItems);
 router.get('/items/:id', ctrl.getMenuItem);
 
 // Admin only

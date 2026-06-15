@@ -112,7 +112,9 @@ exports.cancelOrder = async (req, res) => {
 
 // Admin: get all orders
 exports.getAllOrders = async (req, res) => {
-  const { status, page = 1, limit = 20 } = req.query;
+  const { status } = req.query;
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
   const offset = (page - 1) * limit;
   try {
     let query = `SELECT o.*, u.name as customer_name, u.phone as customer_phone,
@@ -133,7 +135,7 @@ exports.getAllOrders = async (req, res) => {
       `SELECT COUNT(*) FROM orders${status ? ' WHERE status = $1' : ''}`,
       status ? [status] : []
     );
-    res.json({ orders: rows, total: parseInt(countResult.rows[0].count), page: parseInt(page), limit: parseInt(limit) });
+    res.json({ orders: rows, total: parseInt(countResult.rows[0].count, 10), page, limit });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -146,6 +148,13 @@ exports.updateOrderStatus = async (req, res) => {
     return res.status(400).json({ message: 'Invalid status' });
   }
   try {
+    if (courier_id) {
+      const { rows: couriers } = await db.query(
+        "SELECT id FROM users WHERE id = $1 AND role = 'courier' AND is_active = true",
+        [courier_id]
+      );
+      if (!couriers.length) return res.status(400).json({ message: 'Invalid courier' });
+    }
     const { rows } = await db.query(
       `UPDATE orders SET status = $1, courier_id = COALESCE($2, courier_id), updated_at = NOW()
        WHERE id = $3 RETURNING *`,

@@ -39,16 +39,21 @@ async function seed() {
          RETURNING id, email, role`,
         [cred.name, cred.email, hash, cred.role, cred.phone, cred.address]
       );
-      // ON CONFLICT path returns the existing row; re-query to get id reliably
-      const { rows: found } = await client.query(
-        'SELECT id, role FROM users WHERE email = $1',
-        [cred.email]
-      );
-      userIds[cred.email] = found[0].id;
-      console.log(`  ${cred.role.padEnd(8)} ${cred.email}  →  id=${found[0].id}  pwd=${cred.password}`);
+      userIds[cred.email] = rows[0].id;
+      console.log(`  ${cred.role.padEnd(8)} ${cred.email}  →  id=${rows[0].id}  pwd=${cred.password}`);
     }
 
     // ── Menu items ────────────────────────────────────────────────────────────
+    // The rebuild below wipes menu_items and all orders. Docker runs this script
+    // on every `docker compose up`, so skip it once data exists unless forced.
+    const reset = process.argv.includes('--reset');
+    const { rows: existing } = await client.query('SELECT COUNT(*)::int AS count FROM menu_items');
+    if (existing[0].count > 0 && !reset) {
+      console.log('\nMenu already seeded — keeping existing data (run "npm run seed:reset" to rebuild demo data).');
+      console.log('\n✓ Seed complete');
+      return;
+    }
+
     console.log('\nRebuilding menu items...');
     await client.query('DELETE FROM menu_items');
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authAPI } from '../services/api';
+import { authAPI, setOnUnauthorized } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +9,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // The api interceptor clears storage on 401; this returns the UI to login.
+    setOnUnauthorized(() => setUser(null));
     (async () => {
       try {
         const stored = await AsyncStorage.getItem('user');

@@ -33,7 +33,8 @@ exports.register = async (req, res) => {
     const token = signToken(rows[0]);
     res.status(201).json({ token, user: rows[0] });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Register error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -57,7 +58,8 @@ exports.login = async (req, res) => {
     const token = signToken(user);
     res.json({ token, user: userWithoutPass });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

@@ -61,7 +61,7 @@ export default function ProfileScreen() {
         <View style={styles.field}>
           <Text style={styles.label}>Адрес доставки</Text>
           {editing
-            ? <TextInput style={[styles.input, { minHeight: 60 }]} value={form.address} onChangeText={set('address')} multiline />
+            ? <TextInput style={[styles.input, { minHeight: 60 }]} value={form.address} onChangeText={set('address')} multiline placeholder="Город, улица, дом" />
             : <Text style={styles.value}>{user?.address || '—'}</Text>
           }
         </View>

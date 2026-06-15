@@ -30,6 +30,23 @@ exports.getMenuItems = async (req, res) => {
   }
 };
 
+exports.getPopularItems = async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      `SELECT m.*, COALESCE(SUM(oi.quantity), 0)::int AS ordered_count
+       FROM menu_items m
+       LEFT JOIN order_items oi ON oi.menu_item_id = m.id
+       WHERE m.is_available = true
+       GROUP BY m.id
+       ORDER BY ordered_count DESC, m.name
+       LIMIT 6`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 exports.getMenuItem = async (req, res) => {
   try {
     const { rows } = await db.query(

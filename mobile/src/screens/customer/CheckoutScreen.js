@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ScrollView, Alert, ActivityIndicator,
 } from 'react-native';
-import { orderAPI } from '../../services/api';
+import { orderAPI, paymentAPI } from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius } from '../../theme';
@@ -17,6 +17,7 @@ export default function CheckoutScreen({ navigation }) {
 
   const handleOrder = async () => {
     if (!address.trim()) return Alert.alert('Ошибка', 'Введите адрес доставки');
+    if (!address.includes(',')) return Alert.alert('Ошибка', 'Укажите город в адресе\nНапример: Москва, ул. Ленина, 1');
     setLoading(true);
     try {
       const { data } = await orderAPI.create({
@@ -25,7 +26,31 @@ export default function CheckoutScreen({ navigation }) {
         notes: notes.trim() || undefined,
       });
       clearCart();
-      navigation.replace('OrderDetail', { orderId: data.id, order: data });
+      Alert.alert(
+        'Заказ оформлен ✅',
+        `Заказ #${data.id} на ${Number(data.total_price).toFixed(2)} ₽ создан.\nОплатить онлайн сейчас?`,
+        [
+          {
+            text: 'Позже',
+            style: 'cancel',
+            onPress: () => navigation.replace('OrderDetail', { orderId: data.id, order: data }),
+          },
+          {
+            text: 'Оплатить',
+            onPress: async () => {
+              navigation.replace('OrderDetail', { orderId: data.id });
+              try {
+                const { data: pay } = await paymentAPI.create(data.id);
+                if (pay.payment_url) {
+                  navigation.navigate('Payment', { url: pay.payment_url, amount: data.total_price });
+                }
+              } catch {
+                Alert.alert('Ошибка', 'Не удалось открыть оплату — попробуйте на экране заказа');
+              }
+            },
+          },
+        ],
+      );
     } catch (err) {
       Alert.alert('Ошибка', err.response?.data?.message || 'Не удалось оформить заказ');
     } finally {
@@ -51,7 +76,7 @@ export default function CheckoutScreen({ navigation }) {
       <Text style={styles.sectionTitle}>Доставка</Text>
       <TextInput
         style={styles.input}
-        placeholder="Адрес доставки*"
+        placeholder="Город, улица, дом*"
         value={address}
         onChangeText={setAddress}
         multiline
@@ -65,7 +90,7 @@ export default function CheckoutScreen({ navigation }) {
       />
 
       <View style={styles.infoBox}>
-        <Text style={styles.infoText}>💳 Оплата при получении</Text>
+        <Text style={styles.infoText}>💳 Оплата онлайн (PayPalych) или при получении</Text>
         <Text style={styles.infoText}>⏱ Примерное время: 30–60 мин</Text>
       </View>
 

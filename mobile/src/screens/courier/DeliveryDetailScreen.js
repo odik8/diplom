@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  Alert, ActivityIndicator, RefreshControl,
+  Alert, ActivityIndicator, RefreshControl, Linking,
 } from 'react-native';
 import { orderAPI } from '../../services/api';
 import { colors, spacing, radius, shadow } from '../../theme';
@@ -34,6 +34,16 @@ export default function DeliveryDetailScreen({ route, navigation }) {
       Alert.alert('Ошибка', err.response?.data?.message || 'Не удалось принять заказ');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const openNavigator = async () => {
+    const encoded = encodeURIComponent(order.delivery_address);
+    const url = `https://yandex.ru/maps/?text=${encoded}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert('Ошибка', 'Не удалось открыть Яндекс Карты');
     }
   };
 
@@ -80,6 +90,9 @@ export default function DeliveryDetailScreen({ route, navigation }) {
         <Text style={styles.sectionTitle}>Адрес доставки</Text>
         <Text style={styles.address}>📍 {order.delivery_address}</Text>
         {order.notes && <Text style={styles.notes}>💬 {order.notes}</Text>}
+        <TouchableOpacity style={styles.naviBtn} onPress={openNavigator}>
+          <Text style={styles.naviBtnText}>🗺 Открыть в Яндекс Навигаторе</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -133,6 +146,8 @@ const styles = StyleSheet.create({
   itemRow: { flexDirection: 'row', justifyContent: 'space-between' },
   itemName: { fontSize: 14, color: colors.text, flex: 1 },
   itemPrice: { fontSize: 14, color: colors.text },
+  naviBtn: { backgroundColor: '#FC3F1D', borderRadius: radius.md, padding: spacing.sm, alignItems: 'center', marginTop: spacing.xs },
+  naviBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   actionBtn: { backgroundColor: colors.primary, borderRadius: radius.md, padding: spacing.md, alignItems: 'center' },
   actionBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   deliveredBadge: { backgroundColor: '#E8F5E9', borderRadius: radius.md, padding: spacing.md, alignItems: 'center' },

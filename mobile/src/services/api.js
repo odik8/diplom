@@ -1,10 +1,21 @@
 import axios from 'axios';
+import { NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
-// Change to your machine's IP when testing on a physical device
-const BASE_URL = 'http://localhost:5001/api';
+// In development the backend runs on the same machine as Metro, so reuse the
+// bundler host — works on simulators, Android emulators and physical devices.
+// The Metro script URL is the most reliable source in a dev client;
+// Constants.expoConfig covers Expo Go.
+const scriptHost = NativeModules.SourceCode?.scriptURL?.match(/^https?:\/\/([^:/]+)/)?.[1];
+const devHost = scriptHost || Constants.expoConfig?.hostUri?.split(':')[0];
+const BASE_URL = `http://${devHost || 'localhost'}:5001/api`;
 
 const api = axios.create({ baseURL: BASE_URL, timeout: 10000 });
+
+// Registered by AuthContext so an expired session returns the user to login.
+let onUnauthorized = null;
+export const setOnUnauthorized = (handler) => { onUnauthorized = handler; };
 
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem('token');
@@ -14,10 +25,10 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err) => {
     if (err.response?.status === 401) {
-      AsyncStorage.removeItem('token');
-      AsyncStorage.removeItem('user');
+      await AsyncStorage.multiRemove(['token', 'user']);
+      onUnauthorized?.();
     }
     return Promise.reject(err);
   }
@@ -34,6 +45,11 @@ export const menuAPI = {
   getCategories: () => api.get('/menu/categories'),
   getItems: (categoryId) => api.get('/menu/items', { params: { category_id: categoryId } }),
   getItem: (id) => api.get(`/menu/items/${id}`),
+  getPopular: () => api.get('/menu/popular'),
+};
+
+export const paymentAPI = {
+  create: (orderId) => api.post(`/payments/${orderId}/create`),
 };
 
 export const orderAPI = {

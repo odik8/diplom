@@ -8,4 +8,9 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: { '/api': process.env.BACKEND_URL || 'http://localhost:5001' },
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/__tests__/setup.js',
+  },
 });

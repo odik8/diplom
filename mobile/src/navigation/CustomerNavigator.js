@@ -12,6 +12,7 @@ import CartScreen from '../screens/customer/CartScreen';
 import CheckoutScreen from '../screens/customer/CheckoutScreen';
 import OrdersScreen from '../screens/customer/OrdersScreen';
 import OrderDetailScreen from '../screens/customer/OrderDetailScreen';
+import PaymentScreen from '../screens/customer/PaymentScreen';
 import ProfileScreen from '../screens/customer/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -39,6 +40,7 @@ function CartStack() {
       <Stack.Screen name="CartMain" component={CartScreen} options={{ title: 'Корзина' }} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Оформление' }} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ title: 'Заказ' }} />
+      <Stack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Оплата' }} />
     </Stack.Navigator>
   );
 }
@@ -48,6 +50,7 @@ function OrdersStack() {
     <Stack.Navigator screenOptions={headerOpts}>
       <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Мои заказы' }} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ title: 'Заказ' }} />
+      <Stack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Оплата' }} />
     </Stack.Navigator>
   );
 }

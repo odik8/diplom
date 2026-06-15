@@ -12,12 +12,16 @@ export default function MenuScreen({ route, navigation }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
   const { addItem, count } = useCart();
 
   const load = useCallback(async () => {
     try {
       const { data } = await menuAPI.getItems(category?.id);
       setItems(data);
+      setError(false);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -30,6 +34,17 @@ export default function MenuScreen({ route, navigation }) {
   }, [load]);
 
   if (loading) return <View style={styles.center}><ActivityIndicator size="large" color={colors.primary} /></View>;
+
+  if (error && !items.length) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>Не удалось загрузить меню</Text>
+        <TouchableOpacity style={styles.retryBtn} onPress={() => { setLoading(true); load(); }}>
+          <Text style={styles.retryBtnText}>Повторить</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -65,7 +80,7 @@ export default function MenuScreen({ route, navigation }) {
         )}
       />
       {count > 0 && (
-        <TouchableOpacity style={styles.cartBar} onPress={() => navigation.navigate('Cart')}>
+        <TouchableOpacity style={styles.cartBar} onPress={() => navigation.navigate('CartTab', { screen: 'CartMain' })}>
           <Text style={styles.cartBarText}>Перейти в корзину ({count} поз.)</Text>
         </TouchableOpacity>
       )}
@@ -74,8 +89,11 @@ export default function MenuScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg },
   empty: { textAlign: 'center', color: colors.textSecondary, marginTop: 40 },
+  errorText: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing.md },
+  retryBtn: { backgroundColor: colors.primary, borderRadius: radius.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
+  retryBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
   card: {
     flexDirection: 'row', backgroundColor: colors.surface,
     borderRadius: radius.md, overflow: 'hidden', ...shadow.sm,
