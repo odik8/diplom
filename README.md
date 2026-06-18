@@ -56,6 +56,26 @@
 
 ---
 
+## Скриншоты
+
+### Мобильное приложение (покупатель)
+
+| Главная | Карточка блюда | Корзина |
+|:---:|:---:|:---:|
+| ![Главная](docs/screenshots/mobile-home.png) | ![Блюдо](docs/screenshots/mobile-dish.png) | ![Корзина](docs/screenshots/mobile-cart.png) |
+| **Оформление заказа** | **Статус заказа** | **Онлайн-оплата** |
+| ![Оформление](docs/screenshots/mobile-checkout.png) | ![Статус](docs/screenshots/mobile-order-status.png) | ![Оплата](docs/screenshots/mobile-payment.png) |
+
+### Веб-панель администратора
+
+| Дашборд | Заказы | Меню |
+|:---:|:---:|:---:|
+| ![Дашборд](docs/screenshots/admin-dashboard.png) | ![Заказы](docs/screenshots/admin-orders.png) | ![Меню](docs/screenshots/admin-menu.png) |
+
+> 📚 Полная документация (тесты, покрытие, скриншоты) — в каталоге [docs/](docs/README.md).
+
+---
+
 ## Технологический стек
 
 | Слой | Технологии |
@@ -135,6 +155,14 @@ cd backend && npm test        # Jest + Supertest (БД мокается)
 cd admin   && npm test        # Vitest + Testing Library
 cd mobile  && npm test        # Jest
 ```
+
+Всего **120 тестов** (backend 92, admin 6, mobile 22). Покрытие бэкенда измеряется командой:
+
+```bash
+cd backend && npm test -- --coverage   # покрытие строк ~82 %
+```
+
+Подробный отчёт о покрытии — в [docs/TEST_COVERAGE.md](docs/TEST_COVERAGE.md).
 
 ---
 
@@ -266,4 +294,11 @@ pending → confirmed → preparing → ready → picked_up → delivered
 
 ## Лицензия
 
-Проект разработан в учебных целях в рамках выпускной квалификационной работы.
+Проект распространяется на условиях лицензии [MIT](LICENSE) и разработан в учебных
+целях в рамках выпускной квалификационной работы.
+
+История изменений ведётся в [CHANGELOG.md](CHANGELOG.md).
+
+## Репозиторий
+
+Исходный код: https://github.com/odik8/diplom

@@ -1,5 +1,4 @@
 diagrams/
-docs/
 
 # Claude Code settings
 .claude/
@@ -39,3 +38,7 @@ coverage/
 # Misc
 tmp/
 temp/
+
+# Local-only working files
+VKR_backup.docx
+PROTOKOL_*.docx
